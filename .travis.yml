@@ -35,6 +35,7 @@ notifications:
 before_script:
   - GO_FILES=$(find . -iname '*.go' -type f | grep -v /vendor/) # All the .go files, excluding vendor/
   - go get github.com/golang/lint/golint                        # Linter
+  - go get github.com/apprentice3d/forge-api-go-client
 #  - go get honnef.co/go/tools/cmd/megacheck                     # Badass static analyzer/linter
 #  - go get github.com/fzipp/gocyclo
 
