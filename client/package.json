@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "hig-react": "^0.28.27",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
     "react-drop-to-upload": "^1.0.1",
