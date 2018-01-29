@@ -92,7 +92,12 @@
 
 
 .scene_creation_element {
-    pointer-events:none;
-    opacity: 0.5;
+    /*pointer-events:none;*/
+    /*opacity: 0.5;*/
     /*background: #CCC;*/
+}
+
+.hig__text-field {
+    margin-top: 5px;
+    margin-bottom: 0px;
 }
