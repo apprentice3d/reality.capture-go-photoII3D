@@ -20,7 +20,7 @@ func StartServer(port string) {
 	http.Handle("/", fs)
 
 	// routes
-	http.HandleFunc("/upload", uploadFiles)
+	http.HandleFunc("/uploadLocalImages", uploadFiles)
 	http.HandleFunc("/gettoken", service.getToken)
 
 

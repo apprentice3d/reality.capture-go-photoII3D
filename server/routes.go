@@ -6,6 +6,8 @@ import (
 	"github.com/apprentice3d/forge-api-go-client/oauth"
 	"github.com/apprentice3d/forge-api-go-client/recap"
 	"encoding/json"
+	"os"
+	"io"
 )
 
 
@@ -33,12 +35,52 @@ func (service ForgeServices) getToken(writer http.ResponseWriter, request *http.
 
 func uploadFiles(writer http.ResponseWriter, request *http.Request) {
 
-	request.ParseMultipartForm(32 << 20)
-	for idx, file := range request.MultipartForm.File {
-		log.Printf("%s => %v\n", idx, file)
+	file, err := os.Create("localfile.jpg")
+
+	if err != nil {
+		log.Fatal(err.Error())
 	}
 
+	size, err:= io.Copy(file,request.Body)
+
+	//data, err := ioutil.ReadAll(request.Body)
+	defer request.Body.Close()
+	if err != nil {
+		log.Println(err.Error())
+		writer.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	log.Printf("Received file")
+	log.Println(size)
+	file.Close()
+
+
+
+	//err := request.ParseMultipartForm(32 << 20)
+	//if err != nil {
+	//	log.Println(err.Error())
+	//	writer.WriteHeader(http.StatusInternalServerError)
+	//	return
+	//}
+
+
+
+
+
+
 	writer.Header().Set("Access-Control-Allow-Origin", "*")
+	writer.Header().Set("Access-Control-Allow-Headers", "*")
 	writer.Write([]byte("Files received"))
+
+
+
+	//request.ParseMultipartForm(32 << 20)
+	//for idx, file := range request.MultipartForm.File {
+	//	log.Printf("%s => %v\n", idx, file)
+	//}
+	//
+	//writer.Header().Set("Access-Control-Allow-Origin", "*")
+	//writer.Write([]byte("Files received"))
 
 }

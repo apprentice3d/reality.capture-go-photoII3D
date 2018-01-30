@@ -101,3 +101,11 @@
     margin-top: 5px;
     margin-bottom: 0px;
 }
+
+.filepicker.dropzone .dz-preview.dz-image-preview {
+    background: none;
+}
+
+.filepicker.dropzone .dz-preview.dz-image-preview .dz-image {
+    border-radius: 5px;
+}

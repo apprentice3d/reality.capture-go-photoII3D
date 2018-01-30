@@ -1,15 +1,43 @@
 import React from 'react';
-import {Button, Container, H3, IconButton, Tab, Table, Tabs, TextCellContent, TextField} from 'hig-react';
+import {Button, Container, H3, IconButton, Spacer, Tab, Table, Tabs, TextCellContent, TextField} from 'hig-react';
+
+import DropzoneComponent from 'react-dropzone-component'
 
 
+const sample_images = [
+    "https://s3.amazonaws.com/photo-ii-3d-sample-images/DSC_1158.JPG",
+    "https://s3.amazonaws.com/photo-ii-3d-sample-images/DSC_1159.JPG",
+    "https://s3.amazonaws.com/photo-ii-3d-sample-images/DSC_1160.JPG",
+    "https://s3.amazonaws.com/photo-ii-3d-sample-images/DSC_1162.JPG",
+    "https://s3.amazonaws.com/photo-ii-3d-sample-images/DSC_1163.JPG",
+    "https://s3.amazonaws.com/photo-ii-3d-sample-images/DSC_1164.JPG",
+    "https://s3.amazonaws.com/photo-ii-3d-sample-images/DSC_1165.JPG",
+];
 
+
+let dropZoneConfig = {
+    iconFiletypes: ['.jpg'],
+    showFiletypeIcon: true,
+    postUrl: "http://" + window.location.hostname + ":3000/uploadLocalImages"
+    // postUrl:"https://requestb.in/1m69x1z1"
+};
 
 
 class ImageUploadingSection extends React.Component {
     constructor(props) {
         super(props);
+
+        let sample = [];
+        // populate example with sample images
+        for (let i = 0; i < sample_images.length; ++i) {
+            sample.push({
+                "id": i,
+                "image_uri": sample_images[i]
+            })
+        }
+
         this.state = {
-            uri_collection: []
+            uri_collection: sample
         }
     }
 
@@ -59,6 +87,12 @@ class ImageUploadingSection extends React.Component {
     };
 
 
+    doneAddingLocalImages = () => {
+        this.props.upload([]);
+    };
+
+
+
     render() {
 
         const column_headers_remote = [
@@ -69,7 +103,8 @@ class ImageUploadingSection extends React.Component {
                 width: "1fr",
                 accessor: "image_uri",
                 Cell: props => (
-                    <TextCellContent text={props.data.image_uri}/>
+                    <TextCellContent text={props.data.image_uri} detail={props.data.image_uri}/>
+
                 )
             },
             {
@@ -89,8 +124,6 @@ class ImageUploadingSection extends React.Component {
         ];
 
 
-
-
         return (
             <div>
                 <H3>Upload images</H3>
@@ -108,19 +141,34 @@ class ImageUploadingSection extends React.Component {
                                 data={this.state.uri_collection}
                             />
                         </div>
+                        <TextField
+                            label="add new image uri"
+                            // placeholder=""
+                            // instructions="add uri and press Enter"
+                            onChange={this.processURI}
+                        />
+                        <Spacer inset="xxs"/>
+                        <div style={{textAlign: "center"}}>
+                            <Button title="Upload images" onClick={this.uploadImages}/>
+                        </div>
                     </Tab>
-                    <Tab label="from a Local Drive">Activities content</Tab>
+                    <Tab label="from a Local Drive">
+                        <Container>
+                            <DropzoneComponent
+                                config={dropZoneConfig}
+                                // eventHandlers={(file) => this.prepareImageForUploading(file)}
+                                // djsConfig={{autoProcessQueue:false}}
+                            />
+                            <div style={{textAlign: "center"}}>
+                                <Spacer inset="xxs"/>
+                                <Button title="Done" onClick={this.doneAddingLocalImages}/>
+
+                            </div>
+                        </Container>
+                    </Tab>
                 </Tabs>
-                <TextField
-                    label="add new image uri"
-                    // placeholder=""
-                    // instructions="add uri and press Enter"
-                    onChange={this.processURI}
-                />
-                {/*</Container>*/}
-                <div style={{textAlign: "center"}} >
-                    <Button title="Upload images" onClick={this.uploadImages}/>
-                </div>
+
+
             </div>
         )
     }

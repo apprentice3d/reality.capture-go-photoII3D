@@ -4,6 +4,8 @@ import {Body, Button, GlobalNav, H3, Modal} from 'hig-react';
 import Content from "./components/Content";
 
 import 'hig-react/lib/hig-react.css';
+import 'react-dropzone-component/styles/filepicker.css';
+import "dropzone/dist/min/dropzone.min.css";
 import './App.css';
 
 

@@ -22,3 +22,4 @@ yarn-debug.log*
 yarn-error.log*
 image_samples/
 client/node_modules/
+localfile.jpg
