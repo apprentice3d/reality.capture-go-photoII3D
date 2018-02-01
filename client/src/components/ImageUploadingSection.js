@@ -37,7 +37,8 @@ class ImageUploadingSection extends React.Component {
         }
 
         this.state = {
-            uri_collection: sample
+            uri_collection: sample,
+            done_uploading: false
         }
     }
 
@@ -83,17 +84,27 @@ class ImageUploadingSection extends React.Component {
 
 
     uploadImages = () => {
+        this.setState({
+            done_uploading: true
+        });
+
         this.props.upload(this.state.uri_collection);
     };
 
 
     doneAddingLocalImages = () => {
+        this.setState({
+            done_uploading: true
+        });
         this.props.upload([]);
     };
 
 
-
     render() {
+
+        const {done_uploading} = this.state;
+
+        let visibility = done_uploading ? "none" : "inline";
 
         const column_headers_remote = [
             {
@@ -133,35 +144,39 @@ class ImageUploadingSection extends React.Component {
                     // onTabChange={this.setActiveTabIndex}
                 >
                     <Tab label="from a Remote Server">
-                        <div>
+                        <div style={{display: visibility}}>
                             <Table
                                 // selectable
                                 density="compressed"
                                 columns={column_headers_remote}
                                 data={this.state.uri_collection}
+
+                            />
+
+                            <TextField
+                                label="add new image uri"
+                                // placeholder=""
+                                // instructions="add uri and press Enter"
+                                onChange={this.processURI}
                             />
                         </div>
-                        <TextField
-                            label="add new image uri"
-                            // placeholder=""
-                            // instructions="add uri and press Enter"
-                            onChange={this.processURI}
-                        />
                         <Spacer inset="xxs"/>
                         <div style={{textAlign: "center"}}>
-                            <Button title="Upload images" onClick={this.uploadImages}/>
+                            <Button title="Upload images" onClick={this.uploadImages} disabled={done_uploading}/>
                         </div>
                     </Tab>
                     <Tab label="from a Local Drive">
                         <Container>
-                            <DropzoneComponent
-                                config={dropZoneConfig}
-                                // eventHandlers={(file) => this.prepareImageForUploading(file)}
-                                // djsConfig={{autoProcessQueue:false}}
-                            />
+                            <div style={{display: visibility}}>
+                                <DropzoneComponent
+                                    config={dropZoneConfig}
+                                    // eventHandlers={(file) => this.prepareImageForUploading(file)}
+                                    // djsConfig={{autoProcessQueue:false}}
+                                />
+                            </div>
                             <div style={{textAlign: "center"}}>
                                 <Spacer inset="xxs"/>
-                                <Button title="Done" onClick={this.doneAddingLocalImages}/>
+                                <Button title="Done" onClick={this.doneAddingLocalImages} disabled={done_uploading}/>
 
                             </div>
                         </Container>

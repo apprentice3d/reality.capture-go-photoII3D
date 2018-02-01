@@ -6,11 +6,16 @@ class SceneCreationSection extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            scene_name: "some_scene_name",
+            scene_name: "",
             output_formats: ["rcm"],
-            scene_type: "aerial"
+            scene_type: "aerial",
+            done_creation: false
         }
     }
+
+    setSceneName = (event) => {
+        this.setState({ scene_name: event.target.value });
+    };
 
 
     sceneTypeSetting = (element) => {
@@ -40,12 +45,15 @@ class SceneCreationSection extends React.Component {
 
 
     createScene = () => {
+        this.setState({
+           done_creation: true
+        });
       this.props.submit(this.state);
     };
 
     render() {
 
-        const {scene_name, output_formats, scene_type} = this.state;
+        const {scene_name, output_formats, scene_type, done_creation} = this.state;
 
 
         return (
@@ -53,8 +61,11 @@ class SceneCreationSection extends React.Component {
                 <H3>Scene setup</H3>
                 <TextField
                     label="Scene name"
-                    placeholder={scene_name}
+                    placeholder="some_scene_name"
                     // instructions="set the scene name here"
+                    disabled={done_creation}
+                    value={scene_name}
+                    onInput={this.setSceneName}
                 />
                 <Spacer inset="xxs"/>
                 <Container>
@@ -63,42 +74,59 @@ class SceneCreationSection extends React.Component {
                               label="rcm: Autodesk ReCap Photo Mesh (default)"
                               onChange={this.sceneFormatSetting}
                               checked={output_formats.indexOf("rcm") > -1}
+                              disabled={done_creation}
 
                     />
                     <Checkbox name="rcs"
                               label="rcs: Autodesk ReCap Point Cloud"
                               onChange={this.sceneFormatSetting}
                               checked={output_formats.indexOf("rcs") > -1}
+                              disabled={done_creation}
                     />
                     <Checkbox name="obj"
                               label="obj: Wavefront Object"
                               onChange={this.sceneFormatSetting}
                               checked={output_formats.indexOf("obj") > -1}
+                              disabled={done_creation}
 
                     />
                     <Checkbox name="ortho"
                               label="ortho: Ortho Photo and Elevation Map"
                               onChange={this.sceneFormatSetting}
                               checked={output_formats.indexOf("ortho") > -1}
+                              disabled={done_creation}
 
                     />
                     <Checkbox name="report"
                               label="report: Quality Report"
                               onChange={this.sceneFormatSetting}
                               checked={output_formats.indexOf("report") > -1}
+                              disabled={done_creation}
 
                     />
                 </Container>
                 <Spacer inset="xxs"/>
                 <Container>
                     <Sub2>Scene type:</Sub2>
-                    <RadioButton label="aerial: Aerial scene" name="aerial" onChange={this.sceneTypeSetting} checked={scene_type === "aerial"}/>
-                    <RadioButton label="object: Object scene" name="object" onChange={this.sceneTypeSetting} checked={scene_type === "object"}/>
+                    <RadioButton
+                        label="aerial: Aerial scene"
+                        name="aerial"
+                        onChange={this.sceneTypeSetting}
+                        checked={scene_type === "aerial"}
+                        disabled={done_creation}
+                    />
+                    <RadioButton
+                        label="object: Object scene"
+                        name="object"
+                        onChange={this.sceneTypeSetting}
+                        checked={scene_type === "object"}
+                        disabled={done_creation}
+                    />
                 </Container>
 
                 <Spacer inset="xxs"/>
                 <div style={{textAlign: "center"}}>
-                    <Button title="Create scene" onClick={this.createScene}/>
+                    <Button title="Create scene" onClick={this.createScene} disabled={done_creation}/>
                 </div>
             </div>
         )

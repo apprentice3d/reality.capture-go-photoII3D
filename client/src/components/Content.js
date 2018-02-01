@@ -11,7 +11,7 @@ import ResultsSection from './ResultsSection'
 
 
 const header =
-    <div style={{margin: "auto", width: "800px"}}>
+    <div style={{margin: "auto", width: "800px"}} >
         <Container >
 
         <H3>The Reality Capture API provides the photogrammetry capability to process digital images</H3>
@@ -19,9 +19,20 @@ const header =
 
         <Sub1> This sample illustrates how any REST-capable mobile, desktop or web application can connect to this API.</Sub1>
 
-        <Sub2>The resulting Reality Capture data (RCM, OBJ, RCS, GeoTIFF) can be viewed
-        within various Autodesk desktop applications such as: ReCap Photo, ReCap Pro, Civil 3D and InfraWorks,
-        but also integrated into Forge pipeline and visualized using Forge Viewer.</Sub2>
+        </Container>
+    </div>;
+
+const footer =
+    <div style={{margin: "auto", width: "800px"}}>
+        <Container >
+
+            <div style={{textAlign:"center"}}>
+                <Sub1> This concludes the process and now the photoscene can be deleted.</Sub1>
+            </div>
+
+            <Sub2>The resulting Reality Capture data (RCM, OBJ, RCS, GeoTIFF) can be viewed
+                within various Autodesk desktop applications such as: ReCap Photo, ReCap Pro, Civil 3D and InfraWorks,
+                but also integrated into Forge pipeline and visualized using Forge Viewer.</Sub2>
         </Container>
     </div>;
 
@@ -78,8 +89,11 @@ class Content extends React.Component {
             get_results: false,
             finished: false,
             available_formats: []
-        }
+        };
+    }
 
+    componentDidMount() {
+        this.refs["header"].scrollIntoView({behavior: 'smooth'});
     }
 
     submitSceneCreation = (sceneSettings) => {
@@ -87,7 +101,7 @@ class Content extends React.Component {
             image_upload: true,
             available_formats: sceneSettings.output_formats
         });
-        this.refs["image_uploading_section"].scrollIntoView({behavior: 'smooth'});
+        this.refs["bottom"].scrollIntoView({behavior: 'smooth'});
 
     };
 
@@ -95,7 +109,7 @@ class Content extends React.Component {
         this.setState({
             start_processing: true
         });
-        this.refs["start_processing_section"].scrollIntoView({behavior: 'smooth'});
+        this.refs["bottom"].scrollIntoView({behavior: 'smooth'});
     };
 
 
@@ -110,9 +124,10 @@ class Content extends React.Component {
             if (this.state.process_progress > 99) {
                 clearInterval(progress);
                 this.setState({
-                    get_results: true
+                    get_results: true,
+                    finished: true
                 });
-                this.refs["get_results_section"].scrollIntoView({behavior: 'smooth'});
+                this.refs["bottom"].scrollIntoView({behavior: 'smooth'});
 
             }
         }, 10);
@@ -133,9 +148,13 @@ class Content extends React.Component {
     };
 
     render() {
+
+        let show_footer = this.state.finished ? footer : "";
+
+
         return (
 
-            <div>
+            <div ref="header">
 
                 {header}
 
@@ -194,8 +213,13 @@ class Content extends React.Component {
                     </div>
 
                 </VerticalTimeline>
+
+                {show_footer}
+
                 <Container>
-                    <H3>Finish</H3>
+                    <div ref="bottom">
+                    <Caption>&copy; Autodesk Forge 2018</Caption>
+                    </div>
                 </Container>
             </div>
         )
