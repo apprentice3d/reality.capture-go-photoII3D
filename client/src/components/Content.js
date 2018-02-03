@@ -1,5 +1,5 @@
 import React from 'react'
-import {Bold, Button, Caption, Container, ContainerViewContent, Grid, GridItem, H3, Sub1, Sub2, Spacer} from 'hig-react'
+import {Bold, Button, Caption, Container, ContainerViewContent, Grid, GridItem, H3, Spacer, Sub1, Sub2} from 'hig-react'
 
 
 import {VerticalTimeline, VerticalTimelineElement} from 'react-vertical-timeline-component';
@@ -11,22 +11,24 @@ import ResultsSection from './ResultsSection'
 
 
 const header =
-    <div style={{margin: "auto", width: "800px"}} >
-        <Container >
+    <div style={{margin: "auto", width: "800px"}}>
+        <Container>
 
-        <H3>The Reality Capture API provides the photogrammetry capability to process digital images</H3>
-            <div style={{textAlign:"center"}}><Sub1>into high resolution textured meshes, dense point clouds and orthophotos.</Sub1></div>
+            <H3>The Reality Capture API provides the photogrammetry capability to process digital images</H3>
+            <div style={{textAlign: "center"}}><Sub1>into high resolution textured meshes, dense point clouds and
+                orthophotos.</Sub1></div>
 
-        <Sub1> This sample illustrates how any REST-capable mobile, desktop or web application can connect to this API.</Sub1>
+            <Sub1> This sample illustrates how any REST-capable mobile, desktop or web application can connect to this
+                API.</Sub1>
 
         </Container>
     </div>;
 
 const footer =
     <div style={{margin: "auto", width: "800px"}}>
-        <Container >
+        <Container>
 
-            <div style={{textAlign:"center"}}>
+            <div style={{textAlign: "center"}}>
                 <Sub1> This concludes the process and now the photoscene can be deleted.</Sub1>
             </div>
 
@@ -70,7 +72,6 @@ const scene_progress_comment =
     </div>;
 
 
-
 const scene_download_comment =
     <div>
         <Sub1>Results are available as a time-limited HTTPS link to an output file of the specified format</Sub1>
@@ -88,7 +89,8 @@ class Content extends React.Component {
             process_progress: 0,
             get_results: false,
             finished: false,
-            available_formats: []
+            available_formats: [],
+            scene_id: ""
         };
     }
 
@@ -98,28 +100,63 @@ class Content extends React.Component {
 
     submitSceneCreation = (sceneSettings) => {
         this.setState({
-            image_upload: true,
             available_formats: sceneSettings.output_formats
         });
-        this.refs["bottom"].scrollIntoView({behavior: 'smooth'});
 
+        fetch("http://" + window.location.hostname + ":3000/create_scene", {
+            method: 'POST',
+            body: JSON.stringify(sceneSettings),
+        }).then(res => res.json()).then(response => {
+            console.log("Scene settings sent successfully, got: ", JSON.stringify(response));
+            this.setState({
+                image_upload: true,
+                scene_id: response["scene_id"]
+            });
+            this.refs["bottom"].scrollIntoView({behavior: 'smooth'});
+
+        }).catch(error => {
+            console.log("Could not send sceneSettings: ", error)
+        });
     };
 
     uploadImages = (imageList) => {
-        this.setState({
-            start_processing: true
+
+        fetch("http://" + window.location.hostname + ":3000/upload_remote_images", {
+            method: 'POST',
+            body: JSON.stringify({
+                scene_id: this.state.scene_id,
+                image_list: imageList
+            }),
+        }).then(res => res.json()).then(response => {
+
+            console.log("Image list successfully, got: ", JSON.stringify(response));
+            this.setState({
+                start_processing: true
+            });
+            this.refs["bottom"].scrollIntoView({behavior: 'smooth'});
+
+        }).catch(error => {
+            console.log("Could not send list of remote images: ", error)
         });
-        this.refs["bottom"].scrollIntoView({behavior: 'smooth'});
     };
 
 
     checkProgress = () => {
         let progress = setInterval(() => {
-
-            //TODO: fetch progress and update the state with it
-            this.setState({
-                process_progress: this.state.process_progress + 5
+            fetch("http://" + window.location.hostname + ":3000/check_progress", {
+                method: 'POST',
+                body: JSON.stringify({
+                    scene_id: this.state.scene_id
+                }),
+            }).then(res => res.json()).then(response => {
+                console.log("Scene progress check: ", response);
+                this.setState({
+                    process_progress: response["progress"]
+                });
+            }).catch(error => {
+                console.log("Could not start scene processing: ", error)
             });
+
 
             if (this.state.process_progress > 99) {
                 clearInterval(progress);
@@ -130,7 +167,7 @@ class Content extends React.Component {
                 this.refs["bottom"].scrollIntoView({behavior: 'smooth'});
 
             }
-        }, 10);
+        }, 1000);
 
 
     };
@@ -138,12 +175,44 @@ class Content extends React.Component {
 
     requestResultOfType = (format) => {
         console.log("Was requested result of type: " + format);
+        fetch("http://" + window.location.hostname + ":3000/get_result", {
+            method: 'POST',
+            body: JSON.stringify({
+                scene_id: this.state.scene_id,
+                format: format
+            }),
+        }).then(res => res.json()).then(response => {
+
+            console.log("Received scene result: ", JSON.stringify(response));
+
+        }).catch(error => {
+            console.log("Could not send list of remote images: ", error)
+        });
     };
 
 
-
-
     startSceneProcessing = () => {
+        fetch("http://" + window.location.hostname + ":3000/start_process", {
+            method: 'POST',
+            body: JSON.stringify({
+                scene_id: this.state.scene_id
+            }),
+        }).then(res => res.json())
+            .catch(error => {
+                console.log("Could not start scene processing: ", error)
+            })
+            .then(response => {
+                if (response !== undefined && response["result"] === "ACK") {
+                    console.log("Scene processing started successfully: ", JSON.stringify(response));
+                    this.setState({
+                        start_processing: true
+                    });
+                    this.refs["bottom"].scrollIntoView({behavior: 'smooth'});
+                } else {
+                    console.log("Could not properly start scene processing")
+                }
+
+            });
         this.checkProgress();
     };
 
@@ -208,8 +277,9 @@ class Content extends React.Component {
                             iconStyle={{background: '#0696D7', color: '#666666'}}
                             // icon={<WorkIcon />}
                         >
-                            <ResultsSection formats={this.state.available_formats} getResult={this.requestResultOfType}/>
-                    </VerticalTimelineElement>
+                            <ResultsSection formats={this.state.available_formats}
+                                            getResult={this.requestResultOfType}/>
+                        </VerticalTimelineElement>
                     </div>
 
                 </VerticalTimeline>
@@ -218,7 +288,7 @@ class Content extends React.Component {
 
                 <Container>
                     <div ref="bottom">
-                    <Caption>&copy; Autodesk Forge 2018</Caption>
+                        <Caption>&copy; Autodesk Forge 2018</Caption>
                     </div>
                 </Container>
             </div>
