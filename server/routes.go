@@ -6,16 +6,8 @@ import (
 	"log"
 	"net/http"
 	"os"
-
-	"github.com/apprentice3d/forge-api-go-client/oauth"
-	"github.com/apprentice3d/forge-api-go-client/recap"
 	"math/rand"
 )
-
-type ForgeServices struct {
-	oauth oauth.AuthApi
-	recap recap.ReCapAPI
-}
 
 func (service ForgeServices) getToken(writer http.ResponseWriter, request *http.Request) {
 
