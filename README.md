@@ -8,5 +8,6 @@
 
 **Forge API:** [![oAuth2](https://img.shields.io/badge/oAuth2-v1-green.svg)](http://developer-autodesk.github.io/)
 [![Reality-Capture](https://img.shields.io/badge/Reality%20Capture-v1-green.svg)](http://developer-autodesk.github.io/)
+
 Sample using [Forge Reality Capture API](https://developer.autodesk.com/api/reality-capture-cover-page/).
 
