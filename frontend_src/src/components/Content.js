@@ -1,13 +1,13 @@
 import React from 'react'
-import {Bold, Button, Caption, Container, ContainerViewContent, Grid, GridItem, H3, Spacer, Sub1, Sub2} from 'hig-react'
+import {Bold, Caption, Container, H3, Sub1, Sub2} from 'hig-react'
 
 
 import {VerticalTimeline, VerticalTimelineElement} from 'react-vertical-timeline-component';
 import 'react-vertical-timeline-component/style.min.css';
 import SceneCreationSection from './SceneCreationSection'
 import ImageUploadingSection from './ImageUploadingSection';
-import SceneStartSection from './SceneStartSection'
-import ResultsSection from './ResultsSection'
+import SceneStartSection from './SceneStartSection';
+import ResultsSection from './ResultsSection';
 
 
 const header =
@@ -73,8 +73,11 @@ const scene_progress_comment =
 
 
 const scene_download_comment =
-    <div>
-        <Sub1>Results are available as a time-limited HTTPS link to an output file of the specified format</Sub1>
+    <div style={{marginLeft: "20%"}}>
+
+        <Sub1>Download results</Sub1>
+        <Sub2>Results are available as a time-limited HTTPS link to an output file</Sub2>
+        <Sub2>of the specified format.</Sub2>
         <Sub2>The link will expire 7 days after the date of processing completion.</Sub2>
     </div>;
 
@@ -273,7 +276,7 @@ class Content extends React.Component {
                         <VerticalTimelineElement
                             position="right"
                             className="query_results_element"
-                            date="Download results"
+                            date={scene_download_comment}
                             iconStyle={{background: '#0696D7', color: '#666666'}}
                             // icon={<WorkIcon />}
                         >

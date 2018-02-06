@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 
-import {Body, Button, GlobalNav, H3, Modal} from 'hig-react';
+import {Body, GlobalNav, H3, Modal} from 'hig-react';
 import Content from "./components/Content";
 
 import 'hig-react/lib/hig-react.css';
@@ -32,7 +32,7 @@ class App extends Component {
             showContent = <Modal
                 title="Forge Secrets Not Properly Set"
                 open={!hasCredentials}
-                style="alternate"
+                // style="alternate"
             >
                 <H3>Could not find credentials</H3>
                 <Body>Please refer to README.md for proper setting the Forge secrets and restart the server</Body>

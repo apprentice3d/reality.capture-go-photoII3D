@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"io"
 	"log"
+	"math/rand"
 	"net/http"
 	"os"
-	"math/rand"
 )
 
 func (service ForgeServices) getToken(writer http.ResponseWriter, request *http.Request) {
@@ -14,7 +14,7 @@ func (service ForgeServices) getToken(writer http.ResponseWriter, request *http.
 	bearer, err := service.oauth.Authenticate("viewables:read")
 	if err != nil {
 		writer.WriteHeader(http.StatusNotAcceptable)
-		_ , err = writer.Write([]byte(err.Error()))
+		_, err = writer.Write([]byte(err.Error()))
 		return
 	}
 
@@ -201,14 +201,14 @@ func (service ForgeServices) checkProgress(writer http.ResponseWriter, request *
 	}
 
 	//TODO: implement starting the image processing
-	progressMimick := rand.Intn(120)
+	progressMimic := rand.Intn(120)
 
-	log.Printf("sceneProgressRequest: %v, returning progress = %d\n", sceneProgressRequest, progressMimick)
+	log.Printf("sceneProgressRequest: %v, returning progress = %d\n", sceneProgressRequest, progressMimic)
 	writer.Header().Set("Access-Control-Allow-Origin", "*")
 	encoder.Encode(struct {
 		SceneID  string `json:"scene_id"`
 		Progress int    `json:"progress"`
-	}{sceneProgressRequest.SceneID, progressMimick})
+	}{sceneProgressRequest.SceneID, progressMimic})
 
 	return
 }

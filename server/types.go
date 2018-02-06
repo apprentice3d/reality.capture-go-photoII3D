@@ -1,8 +1,8 @@
 package server
 
 import (
-	"github.com/apprentice3d/forge-api-go-client/recap"
 	"github.com/apprentice3d/forge-api-go-client/oauth"
+	"github.com/apprentice3d/forge-api-go-client/recap"
 )
 
 // ForgeServices holds all references necessary to access Forge services
