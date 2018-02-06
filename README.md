@@ -58,7 +58,7 @@ This sample code contains 2 parts:
 - a [React](https://reactjs.org/) powered frontend, contained in `frontend_src` folder
 - a [Go](https://golang.org/) powered backend, mainly contained in `server` folder
 
-The suggested approach for experiments and developmentis to:
+The suggested approach for experiments and development is to:
 
  1. start the backed by running `go run main.go`
  2. start the frontend by switching to `frontend_src`, installing all
