@@ -14,12 +14,13 @@ func (service ForgeServices) getToken(writer http.ResponseWriter, request *http.
 	bearer, err := service.oauth.Authenticate("viewables:read")
 	if err != nil {
 		writer.WriteHeader(http.StatusNotAcceptable)
-		writer.Write([]byte(err.Error()))
+		_ , err = writer.Write([]byte(err.Error()))
 		return
 	}
 
 	encoder := json.NewEncoder(writer)
-	encoder.Encode(bearer)
+	err = encoder.Encode(bearer)
+	log.Println("ERROR: could not encode bearer: ", err.Error())
 }
 
 func (service ForgeServices) createScene(writer http.ResponseWriter, request *http.Request) {

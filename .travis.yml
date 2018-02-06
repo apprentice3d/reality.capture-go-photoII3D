@@ -1,6 +1,10 @@
 language: go
 go:
 - 1.9.2
+env:
+  - NODE_VERSION="6.10.0"
+before_install:
+  - nvm install $NODE_VERSION
 install: true
 notifications:
   email: false
