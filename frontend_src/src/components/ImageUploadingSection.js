@@ -5,13 +5,25 @@ import DropzoneComponent from 'react-dropzone-component'
 
 
 const sample_images = [
-    "https://s3.amazonaws.com/photo-ii-3d-sample-images/DSC_1158.JPG",
-    "https://s3.amazonaws.com/photo-ii-3d-sample-images/DSC_1159.JPG",
-    "https://s3.amazonaws.com/photo-ii-3d-sample-images/DSC_1160.JPG",
-    "https://s3.amazonaws.com/photo-ii-3d-sample-images/DSC_1162.JPG",
-    "https://s3.amazonaws.com/photo-ii-3d-sample-images/DSC_1163.JPG",
-    "https://s3.amazonaws.com/photo-ii-3d-sample-images/DSC_1164.JPG",
-    "https://s3.amazonaws.com/photo-ii-3d-sample-images/DSC_1165.JPG",
+    "https://s3.amazonaws.com/photo-ii-3d-sample-images/IMG_1700.JPG",
+    "https://s3.amazonaws.com/photo-ii-3d-sample-images/IMG_1701.JPG",
+    "https://s3.amazonaws.com/photo-ii-3d-sample-images/IMG_1702.JPG",
+    "https://s3.amazonaws.com/photo-ii-3d-sample-images/IMG_1703.JPG",
+    "https://s3.amazonaws.com/photo-ii-3d-sample-images/IMG_1704.JPG",
+    "https://s3.amazonaws.com/photo-ii-3d-sample-images/IMG_1705.JPG",
+    "https://s3.amazonaws.com/photo-ii-3d-sample-images/IMG_1706.JPG",
+    "https://s3.amazonaws.com/photo-ii-3d-sample-images/IMG_1707.JPG",
+    "https://s3.amazonaws.com/photo-ii-3d-sample-images/IMG_1708.JPG",
+    "https://s3.amazonaws.com/photo-ii-3d-sample-images/IMG_1709.JPG",
+    "https://s3.amazonaws.com/photo-ii-3d-sample-images/IMG_1710.JPG",
+    "https://s3.amazonaws.com/photo-ii-3d-sample-images/IMG_1711.JPG",
+    "https://s3.amazonaws.com/photo-ii-3d-sample-images/IMG_1712.JPG",
+    "https://s3.amazonaws.com/photo-ii-3d-sample-images/IMG_1713.JPG",
+    "https://s3.amazonaws.com/photo-ii-3d-sample-images/IMG_1714.JPG",
+    "https://s3.amazonaws.com/photo-ii-3d-sample-images/IMG_1715.JPG",
+    "https://s3.amazonaws.com/photo-ii-3d-sample-images/IMG_1716.JPG",
+    "https://s3.amazonaws.com/photo-ii-3d-sample-images/IMG_1717.JPG"
+
 ];
 
 
@@ -19,7 +31,6 @@ let dropZoneConfig = {
     iconFiletypes: ['.jpg'],
     showFiletypeIcon: true,
     postUrl: "http://" + window.location.hostname + ":3000/uploadLocalImages"
-    // postUrl:"https://requestb.in/1m69x1z1"
 };
 
 

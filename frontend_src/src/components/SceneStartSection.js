@@ -29,6 +29,11 @@ class SceneStartSection extends React.Component {
 
         let display;
         const {progress} = this.props;
+        if (progress > 99) {
+            this.setState({
+                progressLabel: "Done."
+            })
+        }
         const {processStarted, processLabel} = this.state;
 
         if (processStarted) {
