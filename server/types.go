@@ -1,7 +1,6 @@
 package server
 
 import (
-	"github.com/apprentice3d/forge-api-go-client/oauth"
 	"github.com/apprentice3d/forge-api-go-client/recap"
 )
 
