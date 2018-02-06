@@ -10,15 +10,14 @@ import (
 )
 
 func (service ForgeServices) getToken(writer http.ResponseWriter, request *http.Request) {
-
-	bearer, err := service.oauth.Authenticate("viewables:read")
+	encoder := json.NewEncoder(writer)
+	bearer, err := service.Authenticate("viewables:read")
 	if err != nil {
 		writer.WriteHeader(http.StatusNotAcceptable)
-		_, err = writer.Write([]byte(err.Error()))
+		encoder.Encode(FrontendReport {"NACK", err.Error()})
 		return
 	}
 
-	encoder := json.NewEncoder(writer)
 	err = encoder.Encode(bearer)
 	log.Println("ERROR: could not encode bearer: ", err.Error())
 }
@@ -27,10 +26,7 @@ func (service ForgeServices) createScene(writer http.ResponseWriter, request *ht
 	encoder := json.NewEncoder(writer)
 	if request.Method != http.MethodPost {
 		writer.WriteHeader(http.StatusMethodNotAllowed)
-		encoder.Encode(struct {
-			Result      string `json:"result"`
-			Description string `json:"description"`
-		}{"NACK", "Expecting POST request"})
+		encoder.Encode(FrontendReport {"NACK", "Expecting POST request"})
 		return
 	}
 
@@ -41,21 +37,25 @@ func (service ForgeServices) createScene(writer http.ResponseWriter, request *ht
 	if err != nil {
 		log.Println(err.Error())
 		writer.WriteHeader(http.StatusInternalServerError)
-		encoder.Encode(struct {
-			Result      string `json:"result"`
-			Description string `json:"description"`
-		}{"NACK", "Could not parse the body request"})
+		encoder.Encode(FrontendReport {"NACK", "Could not parse the body request"})
 		return
 	}
 
-	//TODO: implement sending create scene request
+	photoScene, err:= service.CreatePhotoScene(sceneCreationRequest.SceneName,
+		sceneCreationRequest.OutputFormats)
+	if err != nil {
+		log.Println(err.Error())
+		writer.WriteHeader(http.StatusInternalServerError)
+		encoder.Encode(FrontendReport {"NACK", err.Error()})
+		return
+	}
 
 	log.Printf("createSceneRequest: %v\n", sceneCreationRequest)
 	writer.Header().Set("Access-Control-Allow-Origin", "*")
 	encoder.Encode(struct {
 		Result  string `json:"result"`
 		SceneID string `json:"scene_id"`
-	}{"ACK", "placeholder for status id"})
+	}{"ACK", photoScene.ID})
 
 	return
 }
@@ -107,10 +107,7 @@ func (service ForgeServices) sendFiles(writer http.ResponseWriter, request *http
 	encoder := json.NewEncoder(writer)
 	if request.Method != http.MethodPost {
 		writer.WriteHeader(http.StatusMethodNotAllowed)
-		encoder.Encode(struct {
-			Result      string `json:"result"`
-			Description string `json:"description"`
-		}{"NACK", "Expecting POST request"})
+		encoder.Encode(FrontendReport {"NACK", "Expecting POST request"})
 		return
 	}
 
@@ -121,10 +118,7 @@ func (service ForgeServices) sendFiles(writer http.ResponseWriter, request *http
 	if err != nil {
 		log.Println(err.Error())
 		writer.WriteHeader(http.StatusInternalServerError)
-		encoder.Encode(struct {
-			Result      string `json:"result"`
-			Description string `json:"description"`
-		}{"NACK", "Could not parse the body request"})
+		encoder.Encode(FrontendReport {"NACK", "Could not parse the body request"})
 		return
 	}
 
@@ -143,10 +137,7 @@ func (service ForgeServices) startProcessing(writer http.ResponseWriter, request
 	encoder := json.NewEncoder(writer)
 	if request.Method != http.MethodPost {
 		writer.WriteHeader(http.StatusMethodNotAllowed)
-		encoder.Encode(struct {
-			Result      string `json:"result"`
-			Description string `json:"description"`
-		}{"NACK", "Expecting POST request"})
+		encoder.Encode(FrontendReport {"NACK", "Expecting POST request"})
 		return
 	}
 
@@ -157,10 +148,7 @@ func (service ForgeServices) startProcessing(writer http.ResponseWriter, request
 	if err != nil {
 		log.Println(err.Error())
 		writer.WriteHeader(http.StatusInternalServerError)
-		encoder.Encode(struct {
-			Result      string `json:"result"`
-			Description string `json:"description"`
-		}{"NACK", "Could not parse the body request"})
+		encoder.Encode(FrontendReport {"NACK", "Could not parse the body request"})
 		return
 	}
 
@@ -179,10 +167,7 @@ func (service ForgeServices) checkProgress(writer http.ResponseWriter, request *
 	encoder := json.NewEncoder(writer)
 	if request.Method != http.MethodPost {
 		writer.WriteHeader(http.StatusMethodNotAllowed)
-		encoder.Encode(struct {
-			Result      string `json:"result"`
-			Description string `json:"description"`
-		}{"NACK", "Expecting POST request"})
+		encoder.Encode(FrontendReport {"NACK", "Expecting POST request"})
 		return
 	}
 
@@ -193,10 +178,7 @@ func (service ForgeServices) checkProgress(writer http.ResponseWriter, request *
 	if err != nil {
 		log.Println(err.Error())
 		writer.WriteHeader(http.StatusInternalServerError)
-		encoder.Encode(struct {
-			Result      string `json:"result"`
-			Description string `json:"description"`
-		}{"NACK", "Could not parse the body request"})
+		encoder.Encode(FrontendReport {"NACK", "Could not parse the body request"})
 		return
 	}
 
@@ -217,10 +199,7 @@ func (service ForgeServices) getResult(writer http.ResponseWriter, request *http
 	encoder := json.NewEncoder(writer)
 	if request.Method != http.MethodPost {
 		writer.WriteHeader(http.StatusMethodNotAllowed)
-		encoder.Encode(struct {
-			Result      string `json:"result"`
-			Description string `json:"description"`
-		}{"NACK", "Expecting POST request"})
+		encoder.Encode(FrontendReport {"NACK", "Expecting POST request"})
 		return
 	}
 
@@ -231,10 +210,7 @@ func (service ForgeServices) getResult(writer http.ResponseWriter, request *http
 	if err != nil {
 		log.Println(err.Error())
 		writer.WriteHeader(http.StatusInternalServerError)
-		encoder.Encode(struct {
-			Result      string `json:"result"`
-			Description string `json:"description"`
-		}{"NACK", "Could not parse the body request"})
+		encoder.Encode(FrontendReport {"NACK", "Could not parse the body request"})
 		return
 	}
 

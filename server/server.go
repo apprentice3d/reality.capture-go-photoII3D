@@ -5,14 +5,15 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/apprentice3d/forge-api-go-client/oauth"
+	"github.com/apprentice3d/forge-api-go-client/recap"
 )
 
 //StartServer is responsible for setting up and lunching a simple web-server on the specified port
 func StartServer(port string) {
 
+	clientID, clientSecret := getForgeSecretsFromENV()
 	service := ForgeServices{
-		oauth: setupForgeOAuth(),
+		recap.NewReCapAPIWithCredentials(clientID, clientSecret),
 	}
 
 	//serving static files
@@ -34,13 +35,13 @@ func StartServer(port string) {
 	}
 }
 
-func setupForgeOAuth() oauth.AuthApi {
-	clientID := os.Getenv("FORGE_CLIENT_ID")
-	clientSecret := os.Getenv("FORGE_CLIENT_SECRET")
+func getForgeSecretsFromENV() (clientID string, clientSecret string) {
+	clientID = os.Getenv("FORGE_CLIENT_ID")
+	clientSecret = os.Getenv("FORGE_CLIENT_SECRET")
 
 	if len(clientID) == 0 || len(clientSecret) == 0 {
 		log.Fatal("The FORGE_CLIENT_ID and FORGE_CLIENT_SECRET env vars are not set. \nExiting ...")
 	}
 
-	return oauth.NewTwoLeggedClient(clientID, clientSecret)
+	return
 }
