@@ -23,3 +23,5 @@ yarn-error.log*
 image_samples/
 client/node_modules/
 localfile.jpg
+frontend_src/node_modules/
+client/

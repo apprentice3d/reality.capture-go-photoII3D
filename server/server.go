@@ -16,7 +16,7 @@ func StartServer(port string) {
 	}
 
 	//serving static files
-	fs := http.FileServer(http.Dir("client/build"))
+	fs := http.FileServer(http.Dir("client"))
 	http.Handle("/", fs)
 
 	// routes
