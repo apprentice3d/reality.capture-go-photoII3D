@@ -54,7 +54,7 @@ func (service ForgeServices) createScene(writer http.ResponseWriter, request *ht
 		return
 	}
 
-	log.Printf("Done createSceneRequest. SceneID = : %s\n", photoScene.ID)
+	log.Printf("Done createSceneRequest. SceneID=%s\n", photoScene.ID)
 
 	writer.Header().Set("Access-Control-Allow-Origin", "*")
 	encoder.Encode(struct {
