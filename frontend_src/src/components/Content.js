@@ -170,7 +170,7 @@ class Content extends React.Component {
                 this.refs["bottom"].scrollIntoView({behavior: 'smooth'});
 
             }
-        }, 1000);
+        }, 10000);
 
 
     };
@@ -187,6 +187,8 @@ class Content extends React.Component {
         }).then(res => res.json()).then(response => {
 
             console.log("Received scene result: ", JSON.stringify(response));
+            console.log("Received responseLink: " + response.link)
+            window.open(response.link,'_blank')
 
         }).catch(error => {
             console.log("Could not send list of remote images: ", error)

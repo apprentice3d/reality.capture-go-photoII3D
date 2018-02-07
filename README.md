@@ -1,4 +1,4 @@
-# forge-photoII3D
+# ***(Work in progress)*** forge-photoII3D
 [![Build Status](https://travis-ci.org/apprentice3d/forge-photoII3D.svg?branch=master)](https://travis-ci.org/apprentice3d/forge-photoII3D)
 [![Go Report Card](https://goreportcard.com/badge/github.com/apprentice3d/forge-photoII3D)](https://goreportcard.com/report/github.com/apprentice3d/forge-photoII3D)
 ![Platforms](https://img.shields.io/badge/platform-windows%20%7C%20osx%20%7C%20linux-lightgray.svg)
@@ -10,7 +10,7 @@
 **Forge API:** [![oAuth2](https://img.shields.io/badge/oAuth2-v1-green.svg)](http://developer-autodesk.github.io/)
 [![Reality-Capture](https://img.shields.io/badge/Reality%20Capture-v1-green.svg)](http://developer-autodesk.github.io/)
 
-`forge-photoII3D` is a sample illustrating use of [Forge Reality Capture API](https://developer.autodesk.com/api/reality-capture-cover-page/).
+ `forge-photoII3D` is a sample illustrating use of [Forge Reality Capture API](https://developer.autodesk.com/api/reality-capture-cover-page/).
 
 ## Setup
 Set the ```FORGE_CLIENT_ID``` and ```FORGE_CLIENT_SECRET``` environment
@@ -35,6 +35,15 @@ and start it by running
 or build it by running
 
     go build
+
+Keep in mind that you have to build the frontend too,
+thus switch to `frontend_src' and run 
+
+    npm run build
+
+that will build (transpile, compress and bundle) the html/js/css code
+and place it into `client` folder in source root for server to serve.
+
 
 ## Usage
 
