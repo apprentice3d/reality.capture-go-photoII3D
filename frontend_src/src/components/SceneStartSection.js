@@ -32,7 +32,13 @@ class SceneStartSection extends React.Component {
         const {processStarted, processLabel} = this.state;
 
         if (processStarted) {
-            display = <ProgressBar percentComplete={progress}/>
+            display = <div>
+                    <Caption>Everything is set:</Caption>
+                    <div style={{textAlign: "center"}}>
+                        <ProgressBar percentComplete={progress}/>
+                    </div>
+                </div>
+
         } else {
             display = <div>
                 <Caption>Everything is set:</Caption>
