@@ -27,3 +27,4 @@ client/node_modules/
 localfile.jpg
 frontend_src/node_modules/
 client/
+Gopkg.lock
