@@ -108,7 +108,7 @@ const sample_images = [
 let dropZoneConfig = {
     iconFiletypes: ['.jpg'],
     showFiletypeIcon: true,
-    postUrl: "http://" + window.location.hostname + ":3000/uploadLocalImages"
+    postUrl: "http://" + window.location.hostname + ":3000/upload_local_images",
 };
 
 
@@ -188,6 +188,12 @@ class ImageUploadingSection extends React.Component {
         this.props.upload([]);
     };
 
+    getSceneID = () => {
+        const {SceneID} = this.props;
+        console.log("Preparing image upload for sceneID = ",SceneID);
+        return SceneID;
+    };
+
 
     render() {
 
@@ -232,6 +238,22 @@ class ImageUploadingSection extends React.Component {
                     // activeTabIndex={this.state.activeTabIndex}
                     // onTabChange={this.setActiveTabIndex}
                 >
+                    <Tab label="from a Local Drive">
+                        <Container>
+                            <div style={{display: visibility}}>
+                                <DropzoneComponent
+                                    config={dropZoneConfig}
+                                    // eventHandlers={(file) => this.prepareImageForUploading(file)}
+                                    djsConfig={{headers:{"sceneid": this.getSceneID()}}}
+                                />
+                            </div>
+                            <div style={{textAlign: "center"}}>
+                                <Spacer inset="xxs"/>
+                                <Button title="Done" onClick={this.doneAddingLocalImages} disabled={done_uploading}/>
+
+                            </div>
+                        </Container>
+                    </Tab>
                     <Tab label="from a Remote Server">
                         <div style={{display: visibility}}>
                             <Table
@@ -254,22 +276,7 @@ class ImageUploadingSection extends React.Component {
                             <Button title="Upload images" onClick={this.uploadImages} disabled={done_uploading}/>
                         </div>
                     </Tab>
-                    <Tab label="from a Local Drive">
-                        <Container>
-                            <div style={{display: visibility}}>
-                                <DropzoneComponent
-                                    config={dropZoneConfig}
-                                    // eventHandlers={(file) => this.prepareImageForUploading(file)}
-                                    // djsConfig={{autoProcessQueue:false}}
-                                />
-                            </div>
-                            <div style={{textAlign: "center"}}>
-                                <Spacer inset="xxs"/>
-                                <Button title="Done" onClick={this.doneAddingLocalImages} disabled={done_uploading}/>
 
-                            </div>
-                        </Container>
-                    </Tab>
                 </Tabs>
 
 

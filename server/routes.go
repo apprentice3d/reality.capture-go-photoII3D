@@ -2,12 +2,12 @@ package server
 
 import (
 	"encoding/json"
-	"io"
 	"log"
 	"net/http"
-	"os"
 	"github.com/apprentice3d/forge-api-go-client/recap"
 	"strconv"
+	"io/ioutil"
+	"encoding/binary"
 )
 
 func (service ForgeServices) getToken(writer http.ResponseWriter, request *http.Request) {
@@ -218,9 +218,6 @@ func (service ForgeServices) getResult(writer http.ResponseWriter, request *http
 		return
 	}
 
-	sampleSceneID := "qQwB6HacvPCXnb8VXO0PQDsqPzyGw8JPxCB79XmjcPs"
-	log.Println(sampleSceneID)
-
 	log.Printf("resultRequest: %v\n", resultRequest)
 
 	result, err := service.GetSceneResults(resultRequest.SceneID, resultRequest.Format)
@@ -251,43 +248,46 @@ func (service ForgeServices) getResult(writer http.ResponseWriter, request *http
 
 func (service ForgeServices) uploadFiles(writer http.ResponseWriter, request *http.Request) {
 
-	file, err := os.Create("localfile.jpg")
+	writer.Header().Set("Access-Control-Allow-Origin", "*")
+	writer.Header().Set("Access-Control-Allow-Headers", "*")
 
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-
-	size, err := io.Copy(file, request.Body)
-
-	//data, err := ioutil.ReadAll(request.Body)
-	defer request.Body.Close()
+	encoder := json.NewEncoder(writer)
+	data, err := ioutil.ReadAll(request.Body)
 	if err != nil {
 		log.Println(err.Error())
 		writer.WriteHeader(http.StatusInternalServerError)
+		encoder.Encode(FrontendReport {"NACK", "Could not parse the body request"})
+		return
+	}
+	defer request.Body.Close()
+
+	if binary.Size(data) == 0 {
+		log.Printf("Frontend is just checking the server availability")
+		writer.WriteHeader(http.StatusOK)
 		return
 	}
 
-	log.Printf("Received file")
-	log.Println(size)
-	file.Close()
+	sceneID := request.Header.Get("sceneid")
 
-	//err := request.ParseMultipartForm(32 << 20)
+	log.Printf("imageUploadRequest of size %v for sceneID= %s\n", binary.Size(data), sceneID)
+
+	result, err := service.AddFilesToSceneUsingData(sceneID, data)
 	//if err != nil {
 	//	log.Println(err.Error())
 	//	writer.WriteHeader(http.StatusInternalServerError)
+	//	encoder.Encode(FrontendReport{"NACK", err.Error()})
 	//	return
 	//}
 
-	writer.Header().Set("Access-Control-Allow-Origin", "*")
-	writer.Header().Set("Access-Control-Allow-Headers", "*")
-	writer.Write([]byte("Files received"))
+	log.Printf("Done uploadingFileRequest for sceneID=%s", sceneID)
 
-	//request.ParseMultipartForm(32 << 20)
-	//for idx, file := range request.MultipartForm.File {
-	//	log.Printf("%s => %v\n", idx, file)
-	//}
-	//
-	//writer.Header().Set("Access-Control-Allow-Origin", "*")
-	//writer.Write([]byte("Files received"))
+	encoder.Encode(struct {
+		SceneID string                   `json:"scene_id"`
+		Data    recap.FileUploadingReply `json:"data"`
+	}{sceneID,
+		result,
+	})
+
+	return
 
 }

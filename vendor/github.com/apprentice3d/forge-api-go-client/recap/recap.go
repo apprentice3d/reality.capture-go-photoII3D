@@ -43,68 +43,14 @@ func (api ReCapAPI) AddFileToSceneUsingLinks(sceneID string, links []string) (up
 }
 
 
-func (api ReCapAPI) AddFilesToScene(scene *PhotoScene, files []string) (uploads []FileUploadingReply, err error) {
-	//bearer, err := api.Authenticate("data:write")
-	//if err != nil {
-	//	return
-	//}
-	//scene.Files = append(scene.Files, files...)
-	//path := api.Host + api.ReCapPath
-	//
-	///******** Parallel way ***************/
-	////create a channel from which workers will consume
-	//workChan := make(chan string, len(files))
-	//for _, filename := range scene.Files {
-	//	workChan <- filename
-	//}
-	//close(workChan)
-	//
-	//// since some OS have limits on open file descriptor
-	//// we have to limit the number of goroutines opening files
-	//workers := 16
-	//if len(scene.Files) < workers {
-	//	workers = len(scene.Files)
-	//}
-	//
-	//successChan := make(chan *FileUploadingReply, len(scene.Files))
-	//errChan := make(chan error, 1)
-	//
-	//for workerID := 0; workerID < workers; workerID++ {
-	//	go func() {
-	//		for file := range workChan {
-	//			reply, err := AddFileToSceneUsingLinks(path, scene.ID, []string{file}, bearer.AccessToken)
-	//			if err != nil {
-	//				errChan <- err
-	//				return
-	//			}
-	//			successChan <- &reply
-	//		}
-	//	}()
-	//}
-	//
-	//for i := 0; i < len(scene.Files); i++ {
-	//	select {
-	//	case result := <-successChan:
-	//		uploads = append(uploads, *result)
-	//		log.Printf("[%d/%d] SUCCESS uploading image: %s\n",
-	//			i+1,
-	//			len(scene.Files),
-	//			result.Files.File.FileName)
-	//	case err = <-errChan:
-	//		return
-	//	}
-	//}
-	/******** END of Parallel way ***************/
+func (api ReCapAPI) AddFilesToSceneUsingData(sceneID string, data []byte) (uploads FileUploadingReply, err error) {
+	bearer, err := api.Authenticate("data:write")
+	if err != nil {
+		return
+	}
+	path := api.Host + api.ReCapPath
 
-	/******** Sequential way ***************/
-	//for _, file := range scene.Files {
-	//	reply, err := AddFileToScene(path, scene.ID, file, bearer.AccessToken)
-	//	if err != nil {
-	//		break
-	//	}
-	//	uploads = append(uploads, reply)
-	//}
-	/******** END of Sequential way ***************/
+	uploads, err = AddFileToSceneUsingFileData(path, sceneID, data, bearer.AccessToken)
 
 	return
 }

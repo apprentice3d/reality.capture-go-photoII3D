@@ -140,6 +140,10 @@ class Content extends React.Component {
 
         }).catch(error => {
             console.log("Could not send list of remote images: ", error)
+            this.setState({
+                start_processing: true
+            });
+            this.refs["bottom"].scrollIntoView({behavior: 'smooth'});
         });
     };
 
@@ -224,6 +228,7 @@ class Content extends React.Component {
     render() {
 
         let show_footer = this.state.finished ? footer : "";
+        const SceneID = this.state.scene_id;
 
 
         return (
@@ -253,7 +258,10 @@ class Content extends React.Component {
                             position="right"
                         >
 
-                            <ImageUploadingSection upload={this.uploadImages}/>
+                            <ImageUploadingSection
+                                upload={this.uploadImages}
+                                SceneID={SceneID}
+                            />
 
                         </VerticalTimelineElement>
                     </div>
