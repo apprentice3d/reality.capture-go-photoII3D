@@ -4,10 +4,18 @@ import (
 	"github.com/apprentice3d/forge-api-go-client/oauth"
 )
 
+
+type ReCapAPI struct {
+	oauth.AuthApi
+	ReCapPath string
+}
+
+
 type MetaData struct {
 	Name   string
 	Values string
 }
+
 
 type PhotoScene struct {
 	ID       string     `json:"photosceneid"`
@@ -17,10 +25,7 @@ type PhotoScene struct {
 	Metadata []MetaData `json:",omitempty"`
 }
 
-type ReCapAPI struct {
-	oauth.AuthApi
-	ReCapPath string
-}
+
 
 type SceneCreationReply struct {
 	Usage      string     `json:",omitempty"`

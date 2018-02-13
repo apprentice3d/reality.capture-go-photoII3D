@@ -117,6 +117,127 @@ func AddFileToSceneUsingLinks(path string, photoSceneId string, links []string, 
 }
 
 
+func AddFileToSceneUsingFilePath(path string, photoSceneId string, filename string, token string) (result FileUploadingReply, err error) {
+
+	file, err := os.Open(filename)
+	defer file.Close()
+	if err != nil {
+		return
+	}
+
+	body := &bytes.Buffer{}
+	writer := multipart.NewWriter(body)
+	formFile, err := writer.CreateFormFile("file[0]", filepath.Base(filename))
+	if err != nil {
+		log.Println(err.Error())
+		return
+	}
+
+	if _, err = io.Copy(formFile, file); err != nil {
+		log.Println(err.Error())
+		return
+	}
+
+	writer.WriteField("photosceneid", photoSceneId)
+	writer.WriteField("type", "image")
+	writer.Close()
+
+	task := http.Client{}
+
+	req, err := http.NewRequest("POST",
+		path+"/file",
+		body)
+
+	if err != nil {
+		return
+	}
+
+	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set("Content-Type", writer.FormDataContentType())
+	response, err := task.Do(req)
+
+	if err != nil {
+		return
+	}
+	defer response.Body.Close()
+	content, _ := ioutil.ReadAll(response.Body)
+
+	if response.StatusCode != 200 {
+		err = errors.New(response.Request.URL.String() + " => [" + strconv.Itoa(response.StatusCode) + "] " + string(content))
+		log.Println(err.Error())
+		return
+	}
+
+	if err = checkMessageForErrors(content); err != nil {
+		return
+	}
+
+	err = json.Unmarshal(content, &result)
+
+	return
+}
+
+
+func AddFileToSceneUsingFileData(path string, photoSceneId string, data []byte, token string) (result FileUploadingReply, err error) {
+	
+	body := &bytes.Buffer{}
+	writer := multipart.NewWriter(body)
+	formFile, err := writer.CreateFormFile("file[0]", "datafile")
+	if err != nil {
+		log.Println(err.Error())
+		return
+	}
+
+	dataContent := bytes.NewReader(data);
+
+
+	if _, err = io.Copy(formFile, dataContent); err != nil {
+		log.Println(err.Error())
+		return
+	}
+
+	writer.WriteField("photosceneid", photoSceneId)
+	writer.WriteField("type", "image")
+	writer.Close()
+
+	task := http.Client{}
+
+	req, err := http.NewRequest("POST",
+		path+"/file",
+		body)
+
+	if err != nil {
+		return
+	}
+
+	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set("Content-Type", writer.FormDataContentType())
+	response, err := task.Do(req)
+
+	if err != nil {
+		return
+	}
+	defer response.Body.Close()
+	content, _ := ioutil.ReadAll(response.Body)
+
+	if response.StatusCode != 200 {
+		err = errors.New(response.Request.URL.String() + " => [" + strconv.Itoa(response.StatusCode) + "] " + string(content))
+		log.Println(err.Error())
+		return
+	}
+
+	if err = checkMessageForErrors(content); err != nil {
+		return
+	}
+
+	err = json.Unmarshal(content, &result)
+
+	return
+}
+
+
+
+
 func StartSceneProcessing(path string, photoSceneId string, token string) (sceneID string, err error) {
 	task := http.Client{}
 
@@ -267,65 +388,7 @@ func DeleteScene(path string, photoSceneId string, token string) (result SceneDe
 
 /******************* AUX FUNCTIONS *******************************/
 
-func readFileAndUpload(path string, photoSceneId string, filename string, token string) (result FileUploadingReply, err error) {
 
-	file, err := os.Open(filename)
-	defer file.Close()
-	if err != nil {
-		return
-	}
-
-	body := &bytes.Buffer{}
-	writer := multipart.NewWriter(body)
-	formFile, err := writer.CreateFormFile("file[0]", filepath.Base(filename))
-	if err != nil {
-		log.Println(err.Error())
-		return
-	}
-
-	if _, err = io.Copy(formFile, file); err != nil {
-		log.Println(err.Error())
-		return
-	}
-
-	writer.WriteField("photosceneid", photoSceneId)
-	writer.WriteField("type", "image")
-	writer.Close()
-
-	task := http.Client{}
-
-	req, err := http.NewRequest("POST",
-		path+"/file",
-		body)
-
-	if err != nil {
-		return
-	}
-
-	req.Header.Set("Authorization", "Bearer "+token)
-	req.Header.Set("Content-Type", writer.FormDataContentType())
-	response, err := task.Do(req)
-
-	if err != nil {
-		return
-	}
-	defer response.Body.Close()
-	content, _ := ioutil.ReadAll(response.Body)
-
-	if response.StatusCode != 200 {
-		err = errors.New(response.Request.URL.String() + " => [" + strconv.Itoa(response.StatusCode) + "] " + string(content))
-		log.Println(err.Error())
-		return
-	}
-
-	if err = checkMessageForErrors(content); err != nil {
-		return
-	}
-
-	err = json.Unmarshal(content, &result)
-
-	return
-}
 
 // Check if the body is not containing an error message
 func checkMessageForErrors(content []byte) (err error) {
