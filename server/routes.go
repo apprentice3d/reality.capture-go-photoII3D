@@ -9,7 +9,6 @@ import (
 	"io/ioutil"
 	"encoding/binary"
 	"fmt"
-	"os"
 )
 
 func (service ForgeServices) getToken(writer http.ResponseWriter, request *http.Request) {
