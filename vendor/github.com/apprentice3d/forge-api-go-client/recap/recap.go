@@ -1,102 +1,132 @@
+// Package recap contains the Go wrappers for calls to Forge Reality Capture API
+// https://developer.autodesk.com/api/reality-capture-cover-page/
+//
+// 	The workflow is simple:
+// 		- create a photoScene
+//		- upload images to photoScene
+//		- start photoScene processing
+//		- get the result
 package recap
 
 import (
-	"errors"
-
 	"github.com/apprentice3d/forge-api-go-client/oauth"
 )
 
-func NewReCapAPIWithCredentials(ClientID string, ClientSecret string) ReCapAPI {
-	recapAPI := ReCapAPI{}
-	recapAPI.BasePath = "/photo-to-3d/v1"
-	return ReCapAPI{
+// API struct holds all paths necessary to access ReCap API
+type API struct {
+	oauth.TwoLeggedAuth
+	ReCapPath string
+}
+
+// NewAPIWithCredentials returns a ReCap API client with default configurations
+func NewAPIWithCredentials(ClientID string, ClientSecret string) API {
+	recapAPI := API{}
+	recapAPI.ReCapPath = "/photo-to-3d/v1"
+	return API{
 		oauth.NewTwoLeggedClient(ClientID, ClientSecret),
 		"/photo-to-3d/v1",
 	}
 }
 
-// CreatePhotoScene is used to prepare a scene with a given name, expected output formats and sceneType
+// CreatePhotoScene prepares a scene with a given name, expected output formats and sceneType
 // 	name - should not be empty
 // 	formats - should be of type rcm, rcs, obj, ortho or report
 // 	sceneType - should be either "aerial" or "object"
-func (api ReCapAPI) CreatePhotoScene(name string, formats []string, sceneType string) (scene PhotoScene, err error) {
+func (api API) CreatePhotoScene(name string, formats []string, sceneType string) (scene PhotoScene, err error) {
 
 	bearer, err := api.Authenticate("data:write")
 	if err != nil {
 		return
 	}
 	path := api.Host + api.ReCapPath
-	scene, err = CreatePhotoScene(path, name, formats, sceneType, bearer.AccessToken)
+	scene, err = createPhotoScene(path, name, formats, sceneType, bearer.AccessToken)
 
 	return
 }
 
-func (api ReCapAPI) AddFileToSceneUsingLinks(sceneID string, links []string) (uploads LinksUploadingReply, err error) {
+// AddFileToSceneUsingLink can be used when the needed images are already available remotely
+// and can be uploaded just by providing the remote link
+func (api API) AddFileToSceneUsingLink(sceneID string, link string) (uploads FileUploadingReply, err error) {
 	bearer, err := api.Authenticate("data:write")
 	if err != nil {
 		return
 	}
 	path := api.Host + api.ReCapPath
 
-	uploads, err = AddFileToSceneUsingLinks(path, sceneID, links, bearer.AccessToken)
+	uploads, err = addFileToSceneUsingLink(path, sceneID, link, bearer.AccessToken)
 	return
 }
 
-
-func (api ReCapAPI) AddFilesToSceneUsingData(sceneID string, data []byte) (uploads FileUploadingReply, err error) {
+// AddFileToSceneUsingData can be used when the image is already available as a byte slice,
+// be it read from a local file or as a result/body of a POST request
+func (api API) AddFileToSceneUsingData(sceneID string, data []byte) (uploads FileUploadingReply, err error) {
 	bearer, err := api.Authenticate("data:write")
 	if err != nil {
 		return
 	}
 	path := api.Host + api.ReCapPath
 
-	uploads, err = AddFileToSceneUsingFileData(path, sceneID, data, bearer.AccessToken)
+	uploads, err = addFileToSceneUsingFileData(path, sceneID, data, bearer.AccessToken)
 
 	return
 }
 
-func (api ReCapAPI) StartSceneProcessing(sceneID string) (result string, err error) {
+// StartSceneProcessing will trigger the processing of a specified scene that can be canceled any time
+func (api API) StartSceneProcessing(sceneID string) (result SceneStartProcessingReply, err error) {
 	bearer, err := api.Authenticate("data:write")
 	if err != nil {
 		return
 	}
 	path := api.Host + api.ReCapPath
-	result, err = StartSceneProcessing(path, sceneID, bearer.AccessToken)
+	result, err = startSceneProcessing(path, sceneID, bearer.AccessToken)
 	return
 }
 
-func (api ReCapAPI) GetSceneProgress(sceneID string) (progress SceneProgressReply, err error) {
+// GetSceneProgress polls the scene processing status and progress
+//	Note: instead of polling, consider using the callback parameter that can be specified upon scene creation
+func (api API) GetSceneProgress(sceneID string) (progress SceneProgressReply, err error) {
 	bearer, err := api.Authenticate("data:read")
 	if err != nil {
 		return
 	}
 	path := api.Host + api.ReCapPath
-	progress, err = GetSceneProgress(path, sceneID, bearer.AccessToken)
+	progress, err = getSceneProgress(path, sceneID, bearer.AccessToken)
 	return
 }
 
-func (api ReCapAPI) GetSceneResults(sceneID string, format string) (result SceneResultReply, err error) {
+// GetSceneResults requests result in a specified format
+//	Note: The link specified in SceneResultReplies will be available for the time specified in reply,
+//	even if the scene is deleted
+func (api API) GetSceneResults(sceneID string, format string) (result SceneResultReply, err error) {
 	bearer, err := api.Authenticate("data:read")
 	if err != nil {
 		return
 	}
 	path := api.Host + api.ReCapPath
-	result, err = GetScene(path, sceneID, bearer.AccessToken, format)
+	result, err = getSceneResult(path, sceneID, bearer.AccessToken, format)
 	return
 }
 
-func (api ReCapAPI) CancelSceneProcessing(scene PhotoScene) (sceneID string, err error) {
-	err = errors.New("method not implemented")
-	return
-}
-
-func (api ReCapAPI) DeleteScene(scene PhotoScene) (sceneID string, err error) {
+// CancelSceneProcessing stops the scene processing, without affecting the already uploaded resources
+func (api API) CancelSceneProcessing(sceneID string) (ID string, err error) {
 	bearer, err := api.Authenticate("data:write")
 	if err != nil {
 		return
 	}
 	path := api.Host + api.ReCapPath
-	_, err = DeleteScene(path, scene.ID, bearer.AccessToken)
-	sceneID = scene.ID
+	_, err = cancelSceneProcessing(path, sceneID, bearer.AccessToken)
+
+	return sceneID, err
+}
+
+// DeleteScene removes all the resources associated with given scene.
+func (api API) DeleteScene(sceneID string) (ID string, err error) {
+	bearer, err := api.Authenticate("data:write")
+	if err != nil {
+		return
+	}
+	path := api.Host + api.ReCapPath
+	_, err = deleteScene(path, sceneID, bearer.AccessToken)
+	ID = sceneID
 	return
 }

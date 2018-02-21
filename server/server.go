@@ -13,7 +13,7 @@ func StartServer(port string) {
 
 	clientID, clientSecret := getForgeSecretsFromENV()
 	service := ForgeServices{
-		recap.NewReCapAPIWithCredentials(clientID, clientSecret),
+		recap.NewAPIWithCredentials(clientID, clientSecret),
 	}
 
 	//serving static files

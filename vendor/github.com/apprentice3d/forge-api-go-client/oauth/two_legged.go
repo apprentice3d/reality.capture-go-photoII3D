@@ -8,40 +8,38 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
-
-	cfg "github.com/apprentice3d/forge-api-go-client/config"
 )
 
-func NewTwoLeggedClient(clientId string, clientSecret string) AuthApi {
-	configuration := cfg.NewConfiguration()
-	configuration.ClientID = clientId
-	configuration.ClientSecret = clientSecret
-	return AuthApi{
-		configuration,
-		"/authentication/v1",
+// TwoLeggedAuth struct holds data necessary for making requests in 2-legged context
+type TwoLeggedAuth struct {
+	AuthData
+}
+
+// TwoLeggedAuthenticator interface defines the method necessary to qualify as 2-legged authenticator
+type TwoLeggedAuthenticator interface {
+	Authenticate(scope string) (Bearer, error)
+}
+
+// NewTwoLeggedClient returns a 2-legged authenticator with default host and authPath
+func NewTwoLeggedClient(clientID, clientSecret string) TwoLeggedAuth {
+	return TwoLeggedAuth{
+		AuthData{
+			clientID,
+			clientSecret,
+			"https://developer.api.autodesk.com",
+			"/authentication/v1",
+		},
 	}
 }
 
-//func NewTwoLeggedClientWithBasePath(clientId string, clientSecret string, basePath string) *TwoLeggedApi {
-//	client := NewTwoLeggedClient(clientId, clientSecret)
-//	client.BasePath = basePath
-//	return client
-//}
-
-/**
- * POST authenticate
- * Get a two-legged access token by providing the needed scope.
- *
- * @param scope Space-separated list of required scopes
- * @return *Bearer and error
- */
-func (a AuthApi) Authenticate(scope string) (*Bearer, error) {
+// Authenticate allows getting a token with a given scope
+func (a TwoLeggedAuth) Authenticate(scope string) (bearer Bearer, err error) {
 
 	task := http.Client{}
 
 	body := url.Values{}
-	body.Add("client_id", a.Configuration.ClientID)
-	body.Add("client_secret", a.Configuration.ClientSecret)
+	body.Add("client_id", a.ClientID)
+	body.Add("client_secret", a.ClientSecret)
 	body.Add("grant_type", "client_credentials")
 	body.Add("scope", scope)
 
@@ -51,27 +49,24 @@ func (a AuthApi) Authenticate(scope string) (*Bearer, error) {
 	)
 
 	if err != nil {
-		return nil, err
+		return
 	}
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	response, err := task.Do(req)
 
 	if err != nil {
-		return nil, err
+		return
 	}
 	defer response.Body.Close()
-	content, _ := ioutil.ReadAll(response.Body)
 
-	if response.StatusCode != 200 {
+	if response.StatusCode != http.StatusOK {
+		content, _ := ioutil.ReadAll(response.Body)
 		err = errors.New("[" + strconv.Itoa(response.StatusCode) + "] " + string(content))
-		return nil, err
+		return
 	}
-	token := new(Bearer)
-	err = json.Unmarshal(content, &token)
 
-	return token, err
-}
+	decoder := json.NewDecoder(response.Body)
+	err = decoder.Decode(&bearer)
 
-func (a AuthApi) GetConfig() cfg.Configuration {
-	return a.Configuration
+	return
 }

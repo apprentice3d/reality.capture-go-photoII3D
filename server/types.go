@@ -6,7 +6,7 @@ import (
 
 // ForgeServices holds all references necessary to access Forge services
 type ForgeServices struct {
-	recap.ReCapAPI
+	recap.API
 }
 
 // CreateSceneRequest reflects structure of data received from client for creating a PhotoScene
