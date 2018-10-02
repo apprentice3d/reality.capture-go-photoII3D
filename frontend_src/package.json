@@ -8,7 +8,7 @@
     "react-dom": "^16.2.0",
     "react-drop-to-upload": "^1.0.1",
     "react-dropzone-component": "^3.1.0",
-    "react-scripts": "1.0.17",
+    "react-scripts": "^2.0.3",
     "react-vertical-timeline-component": "^2.0.5"
   },
   "scripts": {
@@ -16,5 +16,11 @@
     "build": "react-scripts build && mv ./build ../client",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
-  }
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
 }
